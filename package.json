@@ -1,0 +1,24 @@
+{
+  "name": "defiauction",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "lint": "eslint --ext .js ."
+  },
+  "type": "module",
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "eslint": "^8.7.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-plugin-import": "^2.25.4"
+  },
+  "dependencies": {
+    "@defichain/jellyfish": "^0.44.0",
+    "@defichain/jellyfish-api-jsonrpc": "^2.15.0",
+    "dotenv": "^14.3.0",
+    "simple-node-logger": "^21.8.12"
+  }
+}
