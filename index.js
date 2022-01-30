@@ -28,23 +28,17 @@ const getConfig = () => {
     NEW_BID_RAISE,
   } = process.env;
 
-  const maxBlockNumber = parseInt(MAX_BLOCK_NUMBER, 10);
-  const blockDelta = parseInt(BLOCK_DELTA, 10);
-  const apiTimeout = parseInt(API_TIMEOUT, 10);
-  const batchIndex = parseInt(BATCH_INDEX, 10);
-  const newBidRaise = parseInt(NEW_BID_RAISE, 10);
-
   const logger = SimpleNodeLogger.createSimpleFileLogger({
     logFilePath: `${VAULT_ID}-${Date.now()}.log`,
     timestampFormat: 'YYYY-MM-DD HH:mm:ss.SSS',
   });
 
   return {
-    maxBlockNumber,
-    blockDelta,
-    apiTimeout,
-    batchIndex,
-    newBidRaise,
+    maxBlockNumber: parseInt(MAX_BLOCK_NUMBER, 10),
+    blockDelta: parseInt(BLOCK_DELTA, 10),
+    apiTimeout: parseInt(API_TIMEOUT, 10),
+    batchIndex: parseInt(BATCH_INDEX, 10),
+    newBidRaise: parseInt(NEW_BID_RAISE, 10),
     vaultId: VAULT_ID,
     clientEndpointUrl: CLIENT_ENDPOINT_URL,
     myWalletAddress: MY_WALLET_ADDRESS,
