@@ -3,9 +3,10 @@ import { JsonRpcClient } from '@defichain/jellyfish-api-jsonrpc';
 import { BigNumber } from '@defichain/jellyfish-api-jsonrpc/node_modules/@defichain/jellyfish-json';
 import { getConfig, logInfo, logError, getHighestBidSoFar, checkRequiredSettings } from './utils';
 
-const getMyNewBid = (highestBidSoFar, minBid, newBidRaise) => {
+const getMyNewBid = (logger, highestBidSoFar, minBid, newBidRaise) => {
   if (!highestBidSoFar) return new BigNumber(minBid);
   const [highestBidAmount = ''] = highestBidSoFar.amount.split('@');
+  logInfo(logger, `Eddigi legmagasabb tét: ${highestBidAmount}`);
   const highestBidNumber = new BigNumber(highestBidAmount);
   return highestBidNumber.multipliedBy(newBidRaise);
 };
@@ -13,12 +14,11 @@ const getMyNewBid = (highestBidSoFar, minBid, newBidRaise) => {
 const placeNewBid = async (client, logger) => {
   const { batchIndex, vaultId, newBidRaise, minBid, maxBid, myWalletAddress, bidToken } = getConfig();
   checkRequiredSettings({ vaultId, newBidRaise, minBid, maxBid, myWalletAddress, bidToken });
-  const highestBidSoFar = getHighestBidSoFar(client, logger, vaultId, batchIndex);
-  logInfo(logger, `Eddigi legmagasabb tét: ${highestBidSoFar}`);
-  const myNewBid = getMyNewBid(highestBidSoFar, minBid, newBidRaise);
+  const highestBidSoFar = await getHighestBidSoFar(client, logger, vaultId, batchIndex);
+  const myNewBid = getMyNewBid(logger, highestBidSoFar, minBid, newBidRaise);
   logInfo(logger, `Új tét amit rakni akarunk: ${myNewBid.toString()}`);
 
-  if (highestBidSoFar.owner === myWalletAddress || myNewBid.isGreaterThan(maxBid)) {
+  if (highestBidSoFar?.owner === myWalletAddress || myNewBid.isGreaterThan(maxBid)) {
     logInfo(logger, 'Nem tesszük meg a tétet mert vagy a miénk az eddigi legnagyobb tét, vagy elértük a maximumot');
     return;
   }
@@ -30,8 +30,8 @@ const placeNewBid = async (client, logger) => {
       from: myWalletAddress,
       amount: `${myNewBid.decimalPlaces(8, BigNumber.ROUND_CEIL).toFixed(8)}@${bidToken}`,
     };
-    await client.loan.placeAuctionBid(bidParams);
-    logInfo(logger, `A tétet sikeresen megtettük a következő paraméterekkel: ${JSON.stringify(bidParams)}`);
+    const id = await client.loan.placeAuctionBid(bidParams);
+    logInfo(logger, `A tétet sikeresen megtettük a következő paraméterekkel: ${JSON.stringify(bidParams)}, ${id}`);
   } catch (error) {
     logError(logger, 'placeAuctionBid hiba', error);
   }
@@ -49,6 +49,20 @@ const printResult = async (client, logger, vaultId, batchIndex) => {
   }
 };
 
+const waitForBlockHeight = async (client, logger, maxBlockNumber, blockDelta, apiTimeout) => {
+  let block = null;
+  while (!block) {
+    try {
+      block = await client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout);
+    } catch (error) {
+      if (!error.message.includes('timeout of 60000ms')) {
+        logError(logger, 'waitForBlockHeight hiba', error);
+      }
+    }
+  }
+  return block;
+};
+
 const run = async () => {
   const { maxBlockNumber, blockDelta, apiTimeout, batchIndex, vaultId, clientEndpointUrl, logger } = getConfig();
   checkRequiredSettings({ maxBlockNumber, blockDelta, apiTimeout, vaultId, clientEndpointUrl });
@@ -56,7 +70,7 @@ const run = async () => {
 
   try {
     logInfo(logger, 'Várunk amíg elérjuk a célblokkot...');
-    let { height: currentBlockHeight } = await client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout);
+    let { height: currentBlockHeight } = await waitForBlockHeight(client, logger, maxBlockNumber, blockDelta, apiTimeout);
     logInfo(logger, `Elértük a célblokkot. A legutolsó elkészült blokk száma ${currentBlockHeight}`);
 
     while (currentBlockHeight < maxBlockNumber) {
@@ -72,7 +86,9 @@ const run = async () => {
 };
 
 console.log('STARTED');
+console.log(' ');
 run()
   .then(() => {
+    console.log(' ');
     console.log('FINISHED');
   });

@@ -1,8 +1,9 @@
 import SimpleNodeLogger from 'simple-node-logger';
 
 export const logError = (logger, message, error) => {
-  logger.error(message, error);
+  logger.error(message);
   console.log(message, error);
+  process.exit();
 };
 
 export const logInfo = (logger, message) => {
@@ -25,7 +26,6 @@ export const getConfig = () => {
     NEW_BID_RAISE,
     NUM_OF_AUCTIONS,
     COOL_DOWN,
-    MIN_DUSD_REWARD,
     MIN_MARGIN,
   } = process.env;
 
@@ -42,7 +42,6 @@ export const getConfig = () => {
     newBidRaise: parseInt(NEW_BID_RAISE, 10),
     numOfAuctions: parseInt(NUM_OF_AUCTIONS, 10),
     coolDown: parseInt(COOL_DOWN, 10),
-    minDusdReward: parseInt(MIN_DUSD_REWARD, 10),
     vaultId: VAULT_ID,
     clientEndpointUrl: CLIENT_ENDPOINT_URL,
     myWalletAddress: MY_WALLET_ADDRESS,

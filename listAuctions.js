@@ -59,8 +59,8 @@ const getAvailableAuctions = async (client, numOfAuctions) => {
 };
 
 const run = async () => {
-  const { clientEndpointUrl, logger, numOfAuctions, coolDown, minDusdReward, minMargin } = getConfig();
-  checkRequiredSettings({ clientEndpointUrl, numOfAuctions, coolDown, minDusdReward, minMargin });
+  const { clientEndpointUrl, logger, numOfAuctions, coolDown, minMargin } = getConfig();
+  checkRequiredSettings({ clientEndpointUrl, numOfAuctions, coolDown, minMargin });
   const client = new JsonRpcClient(clientEndpointUrl);
   const auctions = await getAvailableAuctions(client, numOfAuctions);
 
@@ -72,7 +72,7 @@ const run = async () => {
     const diff = reward.minus(startingBid);
     const margin = diff.dividedBy(startingBid).multipliedBy(100);
     wait(coolDown);
-    if (diff.isGreaterThanOrEqualTo(minDusdReward) && margin.isGreaterThanOrEqualTo(minMargin)) {
+    if (margin.isGreaterThanOrEqualTo(minMargin)) {
       console.log({
         url,
         minBid: `${startingBid.toPrecision(10)} DUSD`,
