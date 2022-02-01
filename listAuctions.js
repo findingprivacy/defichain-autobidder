@@ -58,12 +58,19 @@ const getAvailableAuctions = async (client, numOfAuctions) => {
   }, []);
 };
 
+const sortyByMargin = ({ margin: first }, { margin: second }) => {
+  if (first.isGreaterThan(second)) return -1;
+  if (second.isGreaterThan(first)) return 1;
+  return 0;
+};
+
 const run = async () => {
   const { clientEndpointUrl, logger, numOfAuctions, coolDown, minMargin } = getConfig();
   checkRequiredSettings({ clientEndpointUrl, numOfAuctions, coolDown, minMargin });
   const client = new JsonRpcClient(clientEndpointUrl);
   const auctions = await getAvailableAuctions(client, numOfAuctions);
 
+  const result = [];
   for (let index = 0; index < auctions.length; index += 1) {
     const auction = auctions[index];
     const startingBid = await getStartingBid(client, logger, auction);
@@ -73,19 +80,23 @@ const run = async () => {
     const margin = diff.dividedBy(startingBid).multipliedBy(100);
     wait(coolDown);
     if (margin.isGreaterThanOrEqualTo(minMargin)) {
-      console.log({
-        url,
-        minBid: `${startingBid.toPrecision(10)} DUSD`,
-        reward: `${reward.toPrecision(10)} DUSD`,
-        diff: `${diff.toPrecision(7)} DUSD`,
-        margin: `${margin.toPrecision(5)}%`,
-      });
+      result.push({ url, minBid: startingBid, reward, diff, margin });
     }
   }
+  result.sort(sortyByMargin);
+  console.log(result.map(({ url, minBid, reward, diff, margin }) => ({
+    url,
+    minBid: `${minBid.toPrecision(10)} DUSD`,
+    reward: `${reward.toPrecision(10)} DUSD`,
+    diff: `${diff.toPrecision(7)} DUSD`,
+    margin: `${margin.toPrecision(5)}%`,
+  })));
 };
 
 console.log('STARTED');
+console.log(' ');
 run()
   .then(() => {
+    console.log(' ');
     console.log('FINISHED');
   });
