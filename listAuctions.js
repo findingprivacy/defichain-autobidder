@@ -73,10 +73,10 @@ const run = async () => {
     wait(coolDown);
     if (diff.isGreaterThanOrEqualTo(minDusdReward)) {
       console.log({
-        diff: diff.toString(),
         url,
-        minBid: startingBid.toString(),
-        reward: reward.toString(),
+        minBid: `${startingBid.toPrecision(10)} DUSD`,
+        reward: `${reward.toPrecision(10)} DUSD`,
+        diff: `${diff.toPrecision(7)} DUSD`,
         margin: `${diff.dividedBy(startingBid).multipliedBy(100).toPrecision(5)}%`,
       });
     }
