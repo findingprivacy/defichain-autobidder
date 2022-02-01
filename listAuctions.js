@@ -59,8 +59,8 @@ const getAvailableAuctions = async (client, numOfAuctions) => {
 };
 
 const run = async () => {
-  const { clientEndpointUrl, logger, numOfAuctions, coolDown, minDusdReward } = getConfig();
-  checkRequiredSettings({ clientEndpointUrl, numOfAuctions, coolDown, minDusdReward });
+  const { clientEndpointUrl, logger, numOfAuctions, coolDown, minDusdReward, minMargin } = getConfig();
+  checkRequiredSettings({ clientEndpointUrl, numOfAuctions, coolDown, minDusdReward, minMargin });
   const client = new JsonRpcClient(clientEndpointUrl);
   const auctions = await getAvailableAuctions(client, numOfAuctions);
 
@@ -70,14 +70,15 @@ const run = async () => {
     const reward = await getRewardPrice(client, auction.collaterals);
     const url = `https://defiscan.live/vaults/${auction.vaultId}/auctions/${auction.index}`;
     const diff = reward.minus(startingBid);
+    const margin = diff.dividedBy(startingBid).multipliedBy(100);
     wait(coolDown);
-    if (diff.isGreaterThanOrEqualTo(minDusdReward)) {
+    if (diff.isGreaterThanOrEqualTo(minDusdReward) && margin.isGreaterThanOrEqualTo(minMargin)) {
       console.log({
         url,
         minBid: `${startingBid.toPrecision(10)} DUSD`,
         reward: `${reward.toPrecision(10)} DUSD`,
         diff: `${diff.toPrecision(7)} DUSD`,
-        margin: `${diff.dividedBy(startingBid).multipliedBy(100).toPrecision(5)}%`,
+        margin: `${margin.toPrecision(5)}%`,
       });
     }
   }

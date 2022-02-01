@@ -26,6 +26,7 @@ export const getConfig = () => {
     NUM_OF_AUCTIONS,
     COOL_DOWN,
     MIN_DUSD_REWARD,
+    MIN_MARGIN,
   } = process.env;
 
   const logger = SimpleNodeLogger.createSimpleFileLogger({
@@ -48,6 +49,7 @@ export const getConfig = () => {
     minBid: MIN_BID,
     maxBid: MAX_BID,
     bidToken: BID_TOKEN,
+    minMargin: MIN_MARGIN,
     logger,
   };
 };
