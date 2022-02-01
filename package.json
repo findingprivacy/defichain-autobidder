@@ -4,12 +4,13 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "node --experimental-specifier-resolution=node index.js",
+    "list": "node --experimental-specifier-resolution=node listAuctions.js",
     "lint": "eslint --ext .js ."
   },
-  "type": "module",
   "author": "",
   "license": "ISC",
+  "type": "module",
   "devDependencies": {
     "eslint": "^8.7.0",
     "eslint-config-airbnb-base": "^15.0.0",
