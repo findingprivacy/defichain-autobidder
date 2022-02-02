@@ -84,6 +84,7 @@ const run = async () => {
     }
   }
   result.sort(sortyByMargin);
+  result.reverse();
   console.log(result.map(({ url, minBid, reward, diff, margin }) => ({
     url,
     minBid: `${minBid.toPrecision(10)} DUSD`,

@@ -63,19 +63,34 @@ const waitForBlockHeight = async (client, logger, maxBlockNumber, blockDelta, ap
   return block;
 };
 
+const waitForNewBlock = async (client, logger, apiTimeout) => {
+  let block = null;
+  while (!block) {
+    try {
+      block = await client.blockchain.waitForNewBlock(apiTimeout);
+    } catch (error) {
+      if (!error.message.includes('timeout of 60000ms')) {
+        logError(logger, 'waitForNewBlock hiba', error);
+      }
+    }
+  }
+  return block;
+};
+
 const run = async () => {
   const { maxBlockNumber, blockDelta, apiTimeout, batchIndex, vaultId, clientEndpointUrl, logger } = getConfig();
   checkRequiredSettings({ maxBlockNumber, blockDelta, apiTimeout, vaultId, clientEndpointUrl });
   const client = new JsonRpcClient(clientEndpointUrl);
 
   try {
+    logInfo(logger, 'NE FELEJTSD EL UNLOCKOLNI A WALLETET!!!');
     logInfo(logger, 'Várunk amíg elérjuk a célblokkot...');
     let { height: currentBlockHeight } = await waitForBlockHeight(client, logger, maxBlockNumber, blockDelta, apiTimeout);
     logInfo(logger, `Elértük a célblokkot. A legutolsó elkészült blokk száma ${currentBlockHeight}`);
 
     while (currentBlockHeight < maxBlockNumber) {
       await placeNewBid(client, logger);
-      const { height } = await client.blockchain.waitForNewBlock(apiTimeout);
+      const { height } = await waitForNewBlock(client, logger, apiTimeout);
       currentBlockHeight = height;
     }
   } catch (error) {
@@ -85,10 +100,7 @@ const run = async () => {
   await printResult(client, logger, vaultId, batchIndex);
 };
 
-console.log('STARTED');
-console.log(' ');
 run()
   .then(() => {
-    console.log(' ');
     console.log('FINISHED');
   });
