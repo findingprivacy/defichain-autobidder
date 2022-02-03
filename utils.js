@@ -56,7 +56,7 @@ export const getConfig = () => {
 export const getHighestBidSoFar = async (client, logger, vaultId, batchIndex) => {
   try {
     const vault = await client.loan.getVault(vaultId);
-    return vault.batches[batchIndex]?.highestBid;
+    return vault.batches?.[batchIndex]?.highestBid;
   } catch (error) {
     logError(logger, 'getVault hiba', error);
     throw new Error(error);
