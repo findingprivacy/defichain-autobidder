@@ -3,7 +3,6 @@ import SimpleNodeLogger from 'simple-node-logger';
 export const logError = (logger, message, error) => {
   logger.error(message);
   console.log(message, error);
-  process.exit();
 };
 
 export const logInfo = (logger, message) => {

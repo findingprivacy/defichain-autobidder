@@ -85,13 +85,14 @@ const run = async () => {
   }
   result.sort(sortyByMargin);
   result.reverse();
-  console.log(result.map(({ url, minBid, reward, diff, margin }) => ({
+  const finelResult = result.map(({ url, minBid, reward, diff, margin }) => ({
     url,
     minBid: `${minBid.toPrecision(10)} DUSD`,
     reward: `${reward.toPrecision(10)} DUSD`,
     diff: `${diff.toPrecision(7)} DUSD`,
     margin: `${margin.toPrecision(5)}%`,
-  })));
+  }));
+  finelResult.forEach(auction => console.log(auction));
 };
 
 console.log('STARTED');

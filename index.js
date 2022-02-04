@@ -39,7 +39,7 @@ const placeNewBid = async (client, logger) => {
 
 const printResult = async (client, logger, vaultId, batchIndex) => {
   try {
-    const auctionHistory = await client.loan.listAuctionHistory('all', { limit: 20000 });
+    const auctionHistory = await client.loan.listAuctionHistory('all', { limit: 1000 });
     const vault = auctionHistory
       .find(auction => auction.vaultId === vaultId && auction.batchIndex === batchIndex);
     logInfo(logger, 'EREDMÉNY');
@@ -69,13 +69,17 @@ const run = async () => {
   const client = new JsonRpcClient(clientEndpointUrl);
 
   try {
+    logInfo(logger, `AUKCIÓ: https://defiscan.live/vaults/${vaultId}/auctions/${batchIndex}`);
     logInfo(logger, 'NE FELEJTSD EL UNLOCKOLNI A WALLETET!!!');
-    logInfo(logger, 'Várunk amíg elérjuk a célblokkot...');
+    logInfo(' ');
+    logInfo(logger, 'Várunk amíg elérjük a célblokkot...');
     let { height: currentBlockHeight } = await waitForBlock(() => client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout));
     logInfo(logger, `Elértük a célblokkot. A legutolsó elkészült blokk száma ${currentBlockHeight}`);
 
     while (currentBlockHeight < maxBlockNumber) {
       await placeNewBid(client, logger);
+      logInfo(' ');
+      logInfo(logger, 'Várunk a következő blokkra...');
       const { height } = await waitForBlock(() => client.blockchain.waitForNewBlock(apiTimeout));
       logInfo(logger, `Új blokk készült el: ${height}`);
       currentBlockHeight = height;
