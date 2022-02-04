@@ -37,7 +37,8 @@ const getStartingBid = async (client, logger, { vaultId, index, loan }) => {
     return loanNum.multipliedBy('1.05');
   }
 
-  const highestBidSoFarNum = await getPriceInDUSD(client, highestBidSoFar, symbol);
+  const [highestBidAmount] = highestBidSoFar.amount.split('@');
+  const highestBidSoFarNum = await getPriceInDUSD(client, highestBidAmount, symbol);
   return highestBidSoFarNum.multipliedBy('1.01');
 };
 

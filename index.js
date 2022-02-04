@@ -71,14 +71,14 @@ const run = async () => {
   try {
     logInfo(logger, `AUKCIÓ: https://defiscan.live/vaults/${vaultId}/auctions/${batchIndex}`);
     logInfo(logger, 'NE FELEJTSD EL UNLOCKOLNI A WALLETET!!!');
-    logInfo(' ');
+    logInfo(logger, ' ');
     logInfo(logger, 'Várunk amíg elérjük a célblokkot...');
     let { height: currentBlockHeight } = await waitForBlock(() => client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout));
     logInfo(logger, `Elértük a célblokkot. A legutolsó elkészült blokk száma ${currentBlockHeight}`);
 
     while (currentBlockHeight < maxBlockNumber) {
       await placeNewBid(client, logger);
-      logInfo(' ');
+      logInfo(logger, ' ');
       logInfo(logger, 'Várunk a következő blokkra...');
       const { height } = await waitForBlock(() => client.blockchain.waitForNewBlock(apiTimeout));
       logInfo(logger, `Új blokk készült el: ${height}`);
