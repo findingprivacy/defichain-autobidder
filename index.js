@@ -49,7 +49,7 @@ const printResult = async (client, logger, vaultId, batchIndex) => {
   }
 };
 
-const waitForBlock = async (apiCall) => {
+const waitForBlock = async (logger, apiCall) => {
   let block = null;
   while (!block) {
     try {
@@ -73,14 +73,14 @@ const run = async () => {
     logInfo(logger, 'NE FELEJTSD EL UNLOCKOLNI A WALLETET!!!');
     logInfo(logger, ' ');
     logInfo(logger, 'Várunk amíg elérjük a célblokkot...');
-    let { height: currentBlockHeight } = await waitForBlock(() => client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout));
+    let { height: currentBlockHeight } = await waitForBlock(logger, () => client.blockchain.waitForBlockHeight(maxBlockNumber - blockDelta, apiTimeout));
     logInfo(logger, `Elértük a célblokkot. A legutolsó elkészült blokk száma ${currentBlockHeight}`);
 
     while (currentBlockHeight < maxBlockNumber) {
       await placeNewBid(client, logger);
       logInfo(logger, ' ');
       logInfo(logger, 'Várunk a következő blokkra...');
-      const { height } = await waitForBlock(() => client.blockchain.waitForNewBlock(apiTimeout));
+      const { height } = await waitForBlock(logger, () => client.blockchain.waitForNewBlock(apiTimeout));
       logInfo(logger, `Új blokk készült el: ${height}`);
       currentBlockHeight = height;
     }
