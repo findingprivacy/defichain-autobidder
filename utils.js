@@ -1,21 +1,8 @@
-import SimpleNodeLogger from 'simple-node-logger';
-
-export const logError = (logger, message, error) => {
-  logger.error(message);
-  console.log(message, error);
-};
-
-export const logInfo = (logger, message) => {
-  logger.info(message);
-  console.log(message);
-};
-
 export const getConfig = () => {
   const {
     CLIENT_ENDPOINT_URL,
     MAX_BLOCK_NUMBER,
     BLOCK_DELTA,
-    API_TIMEOUT,
     BATCH_INDEX,
     VAULT_ID,
     MY_WALLET_ADDRESS,
@@ -28,15 +15,9 @@ export const getConfig = () => {
     MIN_MARGIN,
   } = process.env;
 
-  const logger = SimpleNodeLogger.createSimpleFileLogger({
-    logFilePath: `${VAULT_ID}-${Date.now()}.log`,
-    timestampFormat: 'YYYY-MM-DD HH:mm:ss.SSS',
-  });
-
   return {
     maxBlockNumber: parseInt(MAX_BLOCK_NUMBER, 10),
     blockDelta: parseInt(BLOCK_DELTA, 10),
-    apiTimeout: parseInt(API_TIMEOUT, 10),
     batchIndex: parseInt(BATCH_INDEX, 10),
     numOfAuctions: parseInt(NUM_OF_AUCTIONS, 10),
     coolDown: parseInt(COOL_DOWN, 10),
@@ -48,16 +29,15 @@ export const getConfig = () => {
     maxBid: MAX_BID,
     bidToken: BID_TOKEN,
     minMargin: MIN_MARGIN,
-    logger,
   };
 };
 
-export const getHighestBidSoFar = async (client, logger, vaultId, batchIndex) => {
+export const getHighestBidSoFar = async (client, vaultId, batchIndex) => {
   try {
     const vault = await client.loan.getVault(vaultId);
     return vault.batches?.[batchIndex]?.highestBid;
   } catch (error) {
-    logError(logger, 'getVault hiba', error);
+    console.error('getVault hiba', error);
     throw new Error(error);
   }
 };

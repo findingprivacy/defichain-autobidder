@@ -19,7 +19,6 @@
   "dependencies": {
     "@defichain/jellyfish": "^0.44.0",
     "@defichain/jellyfish-api-jsonrpc": "^2.15.0",
-    "dotenv": "^14.3.0",
-    "simple-node-logger": "^21.8.12"
+    "dotenv": "^14.3.0"
   }
 }
