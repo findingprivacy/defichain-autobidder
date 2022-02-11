@@ -1,7 +1,7 @@
-import 'dotenv/config';
-import { JsonRpcClient } from '@defichain/jellyfish-api-jsonrpc';
-import { BigNumber } from '@defichain/jellyfish-api-jsonrpc/node_modules/@defichain/jellyfish-json';
-import { getConfig, getHighestBidSoFar, wait, checkRequiredSettings } from './utils';
+require('dotenv').config();
+const { JsonRpcClient } = require('@defichain/jellyfish-api-jsonrpc');
+const { BigNumber } = require('@defichain/jellyfish-api-jsonrpc/node_modules/@defichain/jellyfish-json');
+const { getConfig, getHighestBidSoFar, wait, checkRequiredSettings } = require('./utils');
 
 const getPriceInDUSD = async (client, amount, symbol) => {
   try {

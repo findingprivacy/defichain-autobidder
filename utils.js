@@ -1,4 +1,4 @@
-export const getConfig = () => {
+const getConfig = () => {
   const {
     CLIENT_ENDPOINT_URL,
     MAX_BLOCK_NUMBER,
@@ -32,7 +32,7 @@ export const getConfig = () => {
   };
 };
 
-export const getHighestBidSoFar = async (client, vaultId, batchIndex) => {
+const getHighestBidSoFar = async (client, vaultId, batchIndex) => {
   try {
     const vault = await client.loan.getVault(vaultId);
     return vault.batches?.[batchIndex]?.highestBid;
@@ -43,10 +43,17 @@ export const getHighestBidSoFar = async (client, vaultId, batchIndex) => {
 };
 
 // eslint-disable-next-line no-promise-executor-return
-export const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
+const wait = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-export const checkRequiredSettings = (config) => {
+const checkRequiredSettings = (config) => {
   Object.entries(config).forEach(([key, value]) => {
     if (!value) throw new Error(`Missing config value: ${key}`);
   });
+};
+
+module.exports = {
+  getConfig,
+  getHighestBidSoFar,
+  wait,
+  checkRequiredSettings,
 };
